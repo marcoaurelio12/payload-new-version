@@ -1,0 +1,15 @@
+# Robots.txt for Alinhadamente Proposal Portal
+# https://www.robotstxt.org/
+
+# Allow all crawlers to access the site
+User-agent: *
+Allow: /
+
+# Disallow access to API endpoints
+Disallow: /api/
+
+# Sitemap location (update with your actual domain)
+# Sitemap: https://yourdomain.com/sitemap.xml
+
+# Note: Proposal pages contain client-specific data
+# Consider adding noindex meta tags to sensitive proposal pages

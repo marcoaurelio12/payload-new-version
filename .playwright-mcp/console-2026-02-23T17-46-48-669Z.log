@@ -1,0 +1,13 @@
+[    1101ms] [ERROR] Access to fetch at 'http://localhost:3000/api/proposals/public/testeproposta/exists' from origin 'http://localhost:3005' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:3005/testeproposta:0
+[    1103ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:3000/api/proposals/public/testeproposta/exists:0
+[    1103ms] [ERROR] Failed to check proposal: TypeError: Failed to fetch
+    at checkProposalExists (http://localhost:3005/services/api.ts:196:26)
+    at checkExists (http://localhost:3005/hooks/useProposalAuth.ts:28:31)
+    at http://localhost:3005/hooks/useProposalAuth.ts:81:5
+    at react-stack-bottom-frame (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:16242:20)
+    at runWithFiberInDEV (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:726:18)
+    at commitHookEffectListMount (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:7767:122)
+    at commitHookPassiveMountEffects (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:7825:60)
+    at commitPassiveMountOnFiber (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:9182:29)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:9163:13)
+    at commitPassiveMountOnFiber (http://localhost:3005/node_modules/.vite/deps/react-dom_client.js?v=e141f29c:9265:13) @ http://localhost:3005/hooks/useProposalAuth.ts:71

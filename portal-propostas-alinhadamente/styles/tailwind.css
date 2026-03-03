@@ -1,0 +1,375 @@
+@import "tailwindcss";
+
+/* ============================================
+   TAILWIND CSS v4 THEME CONFIGURATION
+   ============================================ */
+
+/* Configure dark mode with class selector */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary Brand Colors */
+  --color-primary: #40CE2A;
+  --color-primary-dark: #35B023;
+  --color-primary-light: #5FD84A;
+
+  /* Brand Colors */
+  --color-brand-black: #191919;
+  --color-brand-white: #FFFFFF;
+
+  /* Custom Gray Scale (Light Mode) */
+  --color-gray-1: #D1D1D1;
+  --color-gray-2: #AEAEAE;
+  --color-gray-3: #8B8B8B;
+  --color-gray-4: #696969;
+  --color-gray-5: #5C5C5C;
+  --color-gray-6: #3D3D3D;
+  --color-gray-7: #1F1F1F;
+  --color-gray-8: #000000;
+
+  /* Status Colors */
+  --color-danger: #DC2626;
+  --color-warning: #F59E0B;
+
+  /* Typography - Custom Font Sizes */
+  --font-size-h1: 64px;
+  --font-size-h2: 48px;
+  --font-size-subheader-1: 32px;
+  --font-size-subheader-2: 24px;
+  --font-size-p1: 18px;
+  --font-size-p2: 16px;
+  --font-size-h1-mobile: 40px;
+  --font-size-h2-mobile: 32px;
+  --font-size-subheader-1-mobile: 24px;
+  --font-size-subheader-2-mobile: 20px;
+
+  /* Line Heights */
+  --line-height-h1: 1.2;
+  --line-height-h2: 1.2;
+  --line-height-subheader-1: 1.3;
+  --line-height-subheader-2: 1.4;
+  --line-height-p1: 1.6;
+  --line-height-p2: 1.5;
+
+  /* Font Weights */
+  --font-weight-heading: 700;
+  --font-weight-subheader: 600;
+  --font-weight-body: 400;
+}
+
+/* ============================================
+   CSS VARIABLES - Light & Dark Mode
+   ============================================ */
+
+:root {
+  /* Light Mode Colors */
+  --bg-main: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-surface: #ffffff;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --border-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  /* Dark Mode - Deep grays and blacks */
+  --bg-main: #0f0f0f;
+  --bg-card: #1a1a1a;
+  --bg-surface: #141414;
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Dark mode background overrides */
+  .dark body,
+  .dark {
+    background-color: #0f0f0f;
+    color: #ffffff;
+  }
+
+  /* Card backgrounds in dark mode */
+  .dark .bg-white {
+    background-color: #1a1a1a !important;
+  }
+
+  .dark .bg-gray-50 {
+    background-color: #0f0f0f !important;
+  }
+
+  .dark .bg-gray-100 {
+    background-color: #141414 !important;
+  }
+
+  /* Text colors in dark mode */
+  .dark .text-gray-900 {
+    color: #ffffff !important;
+  }
+
+  .dark .text-gray-800 {
+    color: #f0f0f0 !important;
+  }
+
+  .dark .text-gray-700 {
+    color: #e0e0e0 !important;
+  }
+
+  .dark .text-gray-600 {
+    color: #c0c0c0 !important;
+  }
+
+  .dark .text-gray-500 {
+    color: #a0a0a0 !important;
+  }
+
+  /* Border colors in dark mode */
+  .dark .border-black\/5 {
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .dark .border-white\/5 {
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .dark .border-black\/10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Background opacity in dark mode */
+  .dark .bg-black\/5 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .dark .bg-black\/\[0\.02\] {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+  }
+
+  .dark .bg-black\/\[0\.01\] {
+    background-color: rgba(255, 255, 255, 0.01) !important;
+  }
+}
+
+/* ============================================
+   COMPONENT STYLES
+   ============================================ */
+
+@layer components {
+  .font-fluent {
+    font-family: 'Segoe UI', "Segoe UI Web (West European)", -apple-system, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .animate-pulse-green {
+    animation: custom-pulse 2s infinite ease-in-out;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #40CE2A;
+    border-radius: 10px;
+  }
+
+  /* Typography Classes */
+  .text-h1 {
+    font-size: 64px;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .text-h2 {
+    font-size: 48px;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .text-subheader-1 {
+    font-size: 32px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .text-subheader-2 {
+    font-size: 24px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .text-p1 {
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-p2 {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* Mobile Typography */
+  @media (max-width: 768px) {
+    .text-h1 {
+      font-size: 40px;
+    }
+
+    .text-h2 {
+      font-size: 32px;
+    }
+
+    .text-subheader-1 {
+      font-size: 24px;
+    }
+
+    .text-subheader-2 {
+      font-size: 20px;
+    }
+  }
+
+  /* Background utility classes */
+  .bg-main {
+    background-color: var(--bg-main);
+  }
+
+  .bg-card {
+    background-color: var(--bg-card);
+  }
+
+  .bg-surface {
+    background-color: var(--bg-surface);
+  }
+
+  .bg-background {
+    background-color: var(--bg-main);
+  }
+}
+
+/* ============================================
+   DARK MODE SPECIFIC OVERRIDES
+   ============================================ */
+
+.dark {
+  /* Ensure dark backgrounds */
+  --tw-bg-opacity: 1;
+}
+
+/* Header dark mode */
+.dark header {
+  background-color: rgba(26, 26, 26, 0.8) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Calculator card dark mode */
+.dark .bg-white {
+  background-color: #1a1a1a !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #0f0f0f !important;
+}
+
+/* Footer dark mode */
+.dark footer {
+  background-color: #0a0a0a !important;
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Adjudication section dark mode */
+.dark .glass-card {
+  background-color: rgba(26, 26, 26, 0.7) !important;
+}
+
+/* Table dark mode */
+.dark table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* ============================================
+   KEYFRAMES
+   ============================================ */
+
+@keyframes custom-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* ============================================
+   PRINT STYLES FOR PDF EXPORT
+   ============================================ */
+
+@media print {
+  body {
+    background-color: white;
+    color: black;
+    overflow: visible;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  header, footer, .fixed-elements {
+    display: none !important;
+  }
+
+  .glass-card {
+    background: white;
+    border: 1px solid #ddd;
+    color: black;
+    box-shadow: none;
+  }
+
+  section {
+    break-inside: avoid;
+    page-break-after: always;
+  }
+}

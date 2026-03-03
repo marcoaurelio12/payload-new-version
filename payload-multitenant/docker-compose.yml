@@ -1,0 +1,32 @@
+services:
+  payload:
+    image: node:20-alpine
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    working_dir: /home/node/app/
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
+    depends_on:
+      - postgres
+    env_file:
+      - .env.local
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: payload_dev
+      POSTGRES_USER: payload_dev
+      POSTGRES_PASSWORD: dev_password_local
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    logging:
+      driver: none
+
+volumes:
+  postgres_data:
+  node_modules:

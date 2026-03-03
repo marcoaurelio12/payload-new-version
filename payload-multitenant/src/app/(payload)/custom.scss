@@ -1,0 +1,1075 @@
+/* =============================================================================
+   Alinhadamente CMS - Custom Admin Styles
+   Using Payload CSS Layers and Alinhadamente Brand Colors
+   Brand: Black (#191919), Green (#40ce2a), White (#ffffff)
+   ============================================================================= */
+
+/* Inter Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Import Payload's SCSS utilities */
+@import '~@payloadcms/ui/scss';
+
+/* =============================================================================
+   Alinhadamente Brand Colors
+   ============================================================================= */
+
+:root {
+  /* Brand Primary */
+  --brand-black: #191919;
+  --brand-green: #40ce2a;
+  --brand-green-light: #4de038;
+  --brand-green-dark: #35b824;
+  --brand-white: #ffffff;
+
+  /* Brand Grayscale */
+  --gray-100: #D1D1D1;
+  --gray-200: #AEAEAE;
+  --gray-300: #8B8B8B;
+  --gray-400: #696969;
+  --gray-500: #5C5C5C;
+  --gray-600: #3D3D3D;
+  --gray-700: #1F1F1F;
+  --gray-800: #000000;
+
+  /* Override Payload theme for dark mode */
+  --theme-bg: var(--gray-800);
+  --theme-input-bg: var(--gray-700);
+  --theme-text: var(--brand-white);
+
+  /* Elevation overrides */
+  --theme-elevation-0: var(--gray-800);
+  --theme-elevation-50: #0a0a0a;
+  --theme-elevation-100: var(--gray-700);
+  --theme-elevation-150: #2a2a2a;
+  --theme-elevation-200: var(--gray-600);
+  --theme-elevation-250: #4a4a4a;
+  --theme-elevation-300: var(--gray-500);
+  --theme-elevation-400: var(--gray-400);
+  --theme-elevation-500: var(--gray-300);
+  --theme-elevation-600: var(--gray-200);
+  --theme-elevation-700: var(--gray-100);
+  --theme-elevation-800: var(--brand-white);
+  --theme-elevation-900: var(--brand-white);
+  --theme-elevation-1000: var(--brand-white);
+
+  /* Accent - Green */
+  --theme-success-500: var(--brand-green);
+  --color-success-500: var(--brand-green);
+  --theme-success-600: var(--brand-green-dark);
+  --color-success-600: var(--brand-green-dark);
+
+  /* Font */
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* =============================================================================
+   Override within Payload's specificity layer
+   ============================================================================= */
+
+@layer payload-default {
+  /* Dark theme for html */
+  html[data-theme='dark'] {
+    --theme-bg: var(--gray-800);
+    --theme-input-bg: var(--gray-700);
+    --theme-text: var(--brand-white);
+  }
+
+  /* =============================================================================
+     LOGIN PAGE
+     ============================================================================= */
+
+  .login {
+    background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+    min-height: 100vh;
+  }
+
+  /* Login form wrapper */
+  .login .login__formWrap {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    padding: calc(var(--base) * 3);
+  }
+
+  /* Fix field spacing - this is the key fix */
+  .login .render-fields .field-type {
+    margin-bottom: calc(var(--base) * 1.5);
+  }
+
+  .login .render-fields .field-type:last-child {
+    margin-bottom: calc(var(--base) * 2);
+  }
+
+  /* Input fields */
+  .login input[type='email'],
+  .login input[type='password'],
+  .login input[type='text'] {
+    background: var(--gray-600);
+    border: 1px solid var(--gray-500);
+    border-radius: var(--style-radius-m);
+    color: var(--brand-white);
+  }
+
+  .login input:focus {
+    border-color: var(--brand-green);
+    box-shadow: 0 0 0 2px rgba(64, 206, 42, 0.3);
+    outline: none;
+  }
+
+  .login input::placeholder {
+    color: var(--gray-300);
+  }
+
+  /* Labels */
+  .login label {
+    color: var(--gray-100);
+  }
+
+  /* Submit button */
+  .login button[type='submit'] {
+    background: var(--brand-green) !important;
+    color: var(--brand-black) !important;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--style-radius-m);
+    transition: all 200ms ease;
+  }
+
+  .login button[type='submit']:hover {
+    background: var(--brand-green-light) !important;
+  }
+
+  /* Links */
+  .login a {
+    color: var(--brand-green);
+  }
+
+  .login a:hover {
+    color: var(--brand-green-light);
+  }
+
+  /* =============================================================================
+     UNAUTHORIZED / WELCOME PAGE (before login)
+     ============================================================================= */
+
+  .unauthorized {
+    background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+    min-height: 100vh;
+
+    .unauthorized__wrap {
+      background: var(--gray-700);
+      border: 1px solid var(--gray-600);
+      border-radius: var(--style-radius-l);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    h1,
+    .unauthorized__title {
+      color: var(--brand-white);
+    }
+
+    p {
+      color: var(--gray-200);
+    }
+
+    a,
+    button {
+      background: var(--brand-green);
+      color: var(--brand-black);
+      font-weight: 600;
+      border-radius: var(--style-radius-m);
+
+      &:hover {
+        background: var(--brand-green-light);
+      }
+    }
+  }
+
+  /* =============================================================================
+     ADMIN GENERAL
+     ============================================================================= */
+
+  #app {
+    font-family: var(--font-body);
+  }
+
+  /* Main background */
+  .app {
+    background: var(--gray-800);
+  }
+
+  /* =============================================================================
+     SIDEBAR / NAVIGATION
+     ============================================================================= */
+
+  .nav {
+    background: var(--gray-700);
+    border-right: 1px solid var(--gray-600);
+  }
+
+  /* Nav links */
+  .nav__link {
+    color: var(--gray-200);
+    border-left: 3px solid transparent;
+    transition: all 200ms ease;
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+      color: var(--brand-white);
+    }
+  }
+
+  /* Active nav link */
+  .nav__link--active {
+    border-left-color: var(--brand-green);
+    background: rgba(64, 206, 42, 0.15);
+    color: var(--brand-green);
+  }
+
+  /* Nav header/logo area */
+  .nav__header {
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  /* Nav footer */
+  .nav__footer {
+    border-top: 1px solid var(--gray-600);
+  }
+
+  /* =============================================================================
+     HEADER
+     ============================================================================= */
+
+  .header {
+    background: var(--gray-700);
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .header__wrapper {
+    background: transparent;
+  }
+
+  /* =============================================================================
+     BUTTONS
+     ============================================================================= */
+
+  /* Primary buttons */
+  .button--primary {
+    background: var(--brand-green);
+    color: var(--brand-black);
+    font-weight: 600;
+    border: none;
+    transition: all 200ms ease;
+
+    &:hover {
+      background: var(--brand-green-light);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(64, 206, 42, 0.3);
+    }
+  }
+
+  /* Secondary buttons */
+  .button--secondary {
+    background: var(--gray-600);
+    color: var(--brand-white);
+    border: 1px solid var(--gray-500);
+
+    &:hover {
+      background: var(--gray-500);
+      border-color: var(--gray-400);
+    }
+  }
+
+  /* Icon buttons */
+  .button--icon {
+    color: var(--gray-300);
+
+    &:hover {
+      color: var(--brand-green);
+      background: rgba(64, 206, 42, 0.1);
+    }
+  }
+
+  /* =============================================================================
+     CARDS
+     ============================================================================= */
+
+  .card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+
+    &:hover {
+      border-color: var(--gray-500);
+    }
+  }
+
+  .card__header {
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .card__title {
+    color: var(--brand-white);
+  }
+
+  /* =============================================================================
+     FORMS / INPUTS
+     ============================================================================= */
+
+  .field-type {
+    margin-bottom: calc(var(--base) * 1.5);
+  }
+
+  /* Text inputs */
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='number'],
+  input[type='url'],
+  input[type='tel'],
+  input[type='search'],
+  textarea {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+    border-radius: var(--style-radius-m);
+    color: var(--brand-white);
+
+    &:focus {
+      border-color: var(--brand-green);
+      box-shadow: 0 0 0 2px rgba(64, 206, 42, 0.3);
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--gray-400);
+    }
+  }
+
+  /* Labels */
+  .field-label {
+    color: var(--gray-100);
+    font-weight: 500;
+  }
+
+  /* Select dropdowns */
+  .rs-picker {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+
+    &:hover,
+    &.rs-picker-focused {
+      border-color: var(--brand-green);
+    }
+  }
+
+  .rs-picker-toggle {
+    background: transparent;
+    color: var(--brand-white);
+  }
+
+  .rs-picker-toggle-value {
+    color: var(--brand-white);
+  }
+
+  .rs-picker-toggle-placeholder {
+    color: var(--gray-400);
+  }
+
+  /* Dropdown menu */
+  .rs-picker-menu {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+  }
+
+  .rs-picker-menu-item {
+    color: var(--gray-200);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+      color: var(--brand-white);
+    }
+
+    &.rs-picker-menu-item-active,
+    &.rs-picker-menu-item-focus {
+      background: rgba(64, 206, 42, 0.15);
+      color: var(--brand-green);
+    }
+  }
+
+  /* Checkboxes */
+  .checkbox-input {
+    input[type='checkbox'] {
+      accent-color: var(--brand-green);
+    }
+  }
+
+  /* Toggle / Switch */
+  .toggle-input__switch {
+    background: var(--gray-500);
+
+    &::after {
+      background: var(--brand-white);
+    }
+  }
+
+  .toggle-input__switch--active {
+    background: var(--brand-green);
+  }
+
+  /* =============================================================================
+     TABLES / LIST VIEWS
+     ============================================================================= */
+
+  .table {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+  }
+
+  .table thead {
+    background: var(--gray-700);
+  }
+
+  .table th {
+    color: var(--gray-300);
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .table td {
+    border-bottom: 1px solid var(--gray-600);
+    color: var(--brand-white);
+  }
+
+  .table tr:hover td {
+    background: rgba(64, 206, 42, 0.05);
+  }
+
+  /* List view */
+  .list-header {
+    background: var(--gray-700);
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .list-controls {
+    background: transparent;
+  }
+
+  .list-item {
+    border-bottom: 1px solid var(--gray-600);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.05);
+    }
+  }
+
+  /* =============================================================================
+     DASHBOARD
+     ============================================================================= */
+
+  .dashboard {
+    background: var(--gray-800);
+  }
+
+  .dashboard__header {
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .dashboard__card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+
+    &:hover {
+      border-color: var(--brand-green);
+      box-shadow: 0 0 20px rgba(64, 206, 42, 0.1);
+    }
+  }
+
+  /* Stats/Pill widgets */
+  .pill {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+  }
+
+  .pill__label {
+    color: var(--gray-300);
+  }
+
+  .pill__value {
+    color: var(--brand-white);
+  }
+
+  /* =============================================================================
+     DOCUMENT EDITOR
+     ============================================================================= */
+
+  .document-header {
+    background: var(--gray-700);
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .document-title {
+    color: var(--brand-white);
+  }
+
+  .edit-form {
+    background: var(--gray-800);
+  }
+
+  /* Tabs in document editor */
+  .tabs {
+    background: transparent;
+  }
+
+  .tabs__tab {
+    color: var(--gray-300);
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      color: var(--gray-100);
+    }
+  }
+
+  .tabs__tab--active {
+    color: var(--brand-green);
+    border-bottom-color: var(--brand-green);
+  }
+
+  /* Field groups / Collapsibles */
+  .collapsible {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+  }
+
+  .collapsible__header {
+    background: transparent;
+    border-bottom: 1px solid var(--gray-600);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.05);
+    }
+  }
+
+  /* =============================================================================
+     RICH TEXT EDITOR (Lexical)
+     ============================================================================= */
+
+  .lexical-editor {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+    border-radius: var(--style-radius-m);
+
+    &:focus-within {
+      border-color: var(--brand-green);
+      box-shadow: 0 0 0 2px rgba(64, 206, 42, 0.3);
+    }
+  }
+
+  .lexical-editor__content {
+    color: var(--brand-white);
+  }
+
+  /* Toolbar */
+  .lexical-toolbar {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-m) var(--style-radius-m) 0 0;
+  }
+
+  .lexical-toolbar__button {
+    color: var(--gray-300);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+      color: var(--brand-green);
+    }
+
+    &.lexical-toolbar__button--active {
+      background: rgba(64, 206, 42, 0.15);
+      color: var(--brand-green);
+    }
+  }
+
+  /* =============================================================================
+     MODALS / DIALOGS
+     ============================================================================= */
+
+  .modal {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .modal__header {
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .modal__title {
+    color: var(--brand-white);
+  }
+
+  .modal__close {
+    color: var(--gray-400);
+
+    &:hover {
+      color: var(--brand-green);
+    }
+  }
+
+  /* Overlay */
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  /* =============================================================================
+     TOASTS / NOTIFICATIONS
+     ============================================================================= */
+
+  .toast {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-m);
+    color: var(--brand-white);
+  }
+
+  .toast--success {
+    border-color: var(--brand-green);
+    background: linear-gradient(135deg, var(--gray-700) 0%, rgba(64, 206, 42, 0.1) 100%);
+
+    .toast__icon {
+      color: var(--brand-green);
+    }
+  }
+
+  .toast--error {
+    border-color: #ef4444;
+
+    .toast__icon {
+      color: #ef4444;
+    }
+  }
+
+  .toast--warning {
+    border-color: #f59e0b;
+
+    .toast__icon {
+      color: #f59e0b;
+    }
+  }
+
+  /* =============================================================================
+     PAGINATION
+     ============================================================================= */
+
+  .pagination {
+    color: var(--gray-300);
+  }
+
+  .pagination__button {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+    color: var(--gray-200);
+
+    &:hover {
+      background: var(--gray-600);
+      border-color: var(--brand-green);
+      color: var(--brand-white);
+    }
+
+    &.pagination__button--active {
+      background: var(--brand-green);
+      border-color: var(--brand-green);
+      color: var(--brand-black);
+    }
+  }
+
+  /* =============================================================================
+     SEARCH
+     ============================================================================= */
+
+  .search {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+    border-radius: var(--style-radius-m);
+
+    &:focus-within {
+      border-color: var(--brand-green);
+      box-shadow: 0 0 0 2px rgba(64, 206, 42, 0.3);
+    }
+  }
+
+  .search__input {
+    background: transparent;
+    color: var(--brand-white);
+
+    &::placeholder {
+      color: var(--gray-400);
+    }
+  }
+
+  .search__icon {
+    color: var(--gray-400);
+  }
+
+  /* =============================================================================
+     STATUS BADGES / TAGS
+     ============================================================================= */
+
+  .badge {
+    background: var(--gray-600);
+    color: var(--gray-200);
+    border-radius: var(--style-radius-m);
+  }
+
+  .badge--success {
+    background: rgba(64, 206, 42, 0.2);
+    color: var(--brand-green);
+  }
+
+  .badge--warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+  }
+
+  .badge--error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+  }
+
+  /* =============================================================================
+     FILE UPLOAD
+     ============================================================================= */
+
+  .upload {
+    background: var(--gray-700);
+    border: 2px dashed var(--gray-500);
+    border-radius: var(--style-radius-l);
+
+    &:hover,
+    &.upload--drag-over {
+      border-color: var(--brand-green);
+      background: rgba(64, 206, 42, 0.05);
+    }
+  }
+
+  .upload__icon {
+    color: var(--gray-400);
+  }
+
+  .upload__text {
+    color: var(--gray-300);
+  }
+
+  /* =============================================================================
+     RELATIONSHIP FIELDS
+     ============================================================================= */
+
+  .relationship {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+    border-radius: var(--style-radius-m);
+
+    &:focus-within {
+      border-color: var(--brand-green);
+    }
+  }
+
+  .relationship__item {
+    background: var(--gray-600);
+    border-radius: var(--style-radius-m);
+
+    &:hover {
+      background: var(--gray-500);
+    }
+  }
+
+  .relationship__item-remove {
+    color: var(--gray-400);
+
+    &:hover {
+      color: #ef4444;
+    }
+  }
+
+  /* =============================================================================
+     DATE PICKER
+     ============================================================================= */
+
+  .date-picker {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-500);
+
+    &:hover,
+    &:focus-within {
+      border-color: var(--brand-green);
+    }
+  }
+
+  /* Calendar popup */
+  .react-datepicker {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+  }
+
+  .react-datepicker__header {
+    background: var(--gray-600);
+    border-bottom: 1px solid var(--gray-500);
+  }
+
+  .react-datepicker__day {
+    color: var(--gray-200);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+    }
+  }
+
+  .react-datepicker__day--selected {
+    background: var(--brand-green) !important;
+    color: var(--brand-black) !important;
+  }
+
+  /* =============================================================================
+     BLOCKS / ARRAY FIELDS
+     ============================================================================= */
+
+  .blocks-field {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-l);
+  }
+
+  .blocks-field__header {
+    background: var(--gray-600);
+    border-radius: var(--style-radius-l) var(--style-radius-l) 0 0;
+  }
+
+  .blocks-field__row {
+    border-bottom: 1px solid var(--gray-600);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.03);
+    }
+  }
+
+  .blocks-field__drag-handle {
+    color: var(--gray-400);
+
+    &:hover {
+      color: var(--brand-green);
+    }
+  }
+
+  /* =============================================================================
+     SETTINGS
+     ============================================================================= */
+
+  .settings {
+    background: var(--gray-800);
+  }
+
+  .settings-nav {
+    background: var(--gray-700);
+    border-right: 1px solid var(--gray-600);
+  }
+
+  .settings-nav__item {
+    color: var(--gray-300);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+      color: var(--brand-white);
+    }
+
+    &.settings-nav__item--active {
+      background: rgba(64, 206, 42, 0.15);
+      color: var(--brand-green);
+      border-left: 3px solid var(--brand-green);
+    }
+  }
+
+  /* =============================================================================
+     GRAPHICS / LOGO
+     ============================================================================= */
+
+  /* Default Payload logo area */
+  .nav .payload-logo {
+    path {
+      fill: var(--brand-green);
+    }
+  }
+
+  /* =============================================================================
+     LOADING STATES
+     ============================================================================= */
+
+  .loading {
+    color: var(--gray-400);
+  }
+
+  .spinner {
+    border-color: var(--gray-600);
+    border-top-color: var(--brand-green);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--gray-700) 25%, var(--gray-600) 50%, var(--gray-700) 75%);
+  }
+
+  /* =============================================================================
+     SCROLLBAR (Webkit)
+     ============================================================================= */
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--gray-700);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--gray-500);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--gray-400);
+    }
+  }
+
+  /* =============================================================================
+     TOOLTIP
+     ============================================================================= */
+
+  .tooltip {
+    background: var(--gray-600);
+    color: var(--brand-white);
+    border-radius: var(--style-radius-m);
+  }
+
+  /* =============================================================================
+     USER AVATAR
+     ============================================================================= */
+
+  .avatar {
+    background: var(--gray-600);
+    color: var(--brand-white);
+    border: 2px solid var(--gray-500);
+  }
+
+  .avatar--initials {
+    background: var(--brand-green);
+    color: var(--brand-black);
+  }
+
+  /* =============================================================================
+     ACCOUNT MENU
+     ============================================================================= */
+
+  .account-menu {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    border-radius: var(--style-radius-m);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  .account-menu__item {
+    color: var(--gray-200);
+
+    &:hover {
+      background: rgba(64, 206, 42, 0.1);
+      color: var(--brand-white);
+    }
+  }
+
+  .account-menu__separator {
+    border-bottom: 1px solid var(--gray-600);
+  }
+}
+
+/* =============================================================================
+   Responsive
+   ============================================================================= */
+
+@include mid-break {
+  .login .login__formWrap {
+    margin: var(--base);
+    padding: calc(var(--base) * 2);
+  }
+
+  .nav {
+    width: 100%;
+  }
+
+  .dashboard__card {
+    padding: calc(var(--base) * 1.5);
+  }
+}
+
+/* =============================================================================
+   Light Mode Override (optional - if user prefers light mode)
+   ============================================================================= */
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --theme-bg: var(--brand-white);
+    --theme-input-bg: var(--gray-100);
+    --theme-text: var(--brand-black);
+
+    --theme-elevation-0: var(--brand-white);
+    --theme-elevation-100: var(--gray-100);
+    --theme-elevation-200: var(--gray-200);
+    --theme-elevation-300: var(--gray-300);
+    --theme-elevation-500: var(--gray-500);
+    --theme-elevation-700: var(--gray-200);
+    --theme-elevation-800: var(--brand-black);
+  }
+
+  @layer payload-default {
+    .login {
+      background: linear-gradient(135deg, var(--gray-100) 0%, var(--brand-white) 100%);
+    }
+
+    .login .login__formWrap {
+      background: var(--brand-white);
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .login input[type='email'],
+    .login input[type='password'],
+    .login input[type='text'] {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      color: var(--brand-black);
+    }
+
+    .login input::placeholder {
+      color: var(--gray-500);
+    }
+
+    .nav {
+      background: var(--brand-white);
+      border-right: 1px solid var(--gray-200);
+    }
+
+    .nav__link--active {
+      background: rgba(64, 206, 42, 0.1);
+    }
+
+    #app {
+      background: var(--gray-100);
+    }
+  }
+}
