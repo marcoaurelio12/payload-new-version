@@ -38,11 +38,11 @@ const Roadmap: React.FC<RoadmapProps> = ({ phases }) => {
 
             {/* Mobile Header */}
             <div className="md:hidden flex items-center space-x-3 mb-2">
-              <div className="w-6 h-6 rounded-full bg-[#41CE2A] flex items-center justify-center text-[#1F1F1F] font-bold text-xs">
+              <div className="w-6 h-6 shrink-0 rounded-full bg-[#41CE2A] flex items-center justify-center text-[#1F1F1F] font-bold text-xs">
                 {phase.phase}
               </div>
-              <h4 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">{phase.title}</h4>
-              <span className="text-xs text-[#41CE2A] border border-[#41CE2A]/30 px-2 py-0.5 rounded">
+              <h4 className="text-xl font-bold text-gray-900 dark:text-white transition-colors truncate">{phase.title}</h4>
+              <span className="text-xs text-[#41CE2A] border border-[#41CE2A]/30 px-2 py-0.5 rounded shrink-0 whitespace-nowrap">
                 {phase.duration}
               </span>
             </div>

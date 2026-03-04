@@ -281,7 +281,10 @@ img {
   color: var(--welcome-text-secondary);
   margin: 0 0 var(--welcome-spacing-lg);
   max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
   line-height: 1.7;
+  text-align: center;
   animation: fadeInUp 0.8s ease-out 0.3s both;
 
   @media (max-width: 768px) {

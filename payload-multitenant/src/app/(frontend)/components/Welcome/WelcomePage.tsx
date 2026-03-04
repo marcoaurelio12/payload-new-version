@@ -45,19 +45,19 @@ export function WelcomePage({ user, siteConfig, adminRoute }: WelcomePageProps) 
         {!user ? (
           <div className="welcome__guest">
             <h1 className="welcome__title">
-              Welcome to{' '}
+              Bem-vindo ao{' '}
               <span className="welcome__title-gradient">
-                {siteConfig?.siteName || 'the Platform'}
+                {siteConfig?.siteName || 'Portal'}
               </span>
             </h1>
             <p className="welcome__subtitle">
-              Sign in to access your dashboard and manage your content with ease.
+              Inicie sessão para aceder ao seu painel e gerir os seus conteúdos com facilidade.
             </p>
             <a
               className="welcome__button welcome__button--primary"
               href={adminRoute}
             >
-              <span>Sign In</span>
+              <span>Entrar</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
@@ -79,7 +79,7 @@ export function WelcomePage({ user, siteConfig, adminRoute }: WelcomePageProps) 
 
       <footer className="welcome__footer">
         <p>
-          Powered by <a href="https://payloadcms.com" target="_blank" rel="noopener noreferrer">Payload CMS</a>
+          Mantido por <a href="https://alinhadamente.pt" target="_blank" rel="noopener noreferrer">Alinhadamente</a>
         </p>
       </footer>
     </div>

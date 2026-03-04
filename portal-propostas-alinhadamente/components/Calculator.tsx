@@ -185,8 +185,8 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                         {addons.map((addon) => (
                             <div key={addon.id} className={`group rounded-2xl border-2 transition-all duration-300 overflow-hidden ${selectedAddOns.includes(addon.id) ? 'border-[#41CE2A] bg-[#41CE2A]/5' : 'border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5'}`}>
                                 <div onClick={() => toggleAddOn(addon.id)} className="p-6 flex items-center justify-between cursor-pointer">
-                                    <div className="flex items-center space-x-5">
-                                        <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${selectedAddOns.includes(addon.id) ? 'bg-[#41CE2A]' : 'bg-black/10 dark:bg-white/10'}`}>
+                                    <div className="flex items-center space-x-5 min-w-0">
+                                        <div className={`w-6 h-6 shrink-0 rounded-md flex items-center justify-center transition-all ${selectedAddOns.includes(addon.id) ? 'bg-[#41CE2A]' : 'bg-black/10 dark:bg-white/10'}`}>
                                             {selectedAddOns.includes(addon.id) && <CheckCircleIcon className="w-5 h-5 text-[#1F1F1F]" />}
                                         </div>
                                         <div>
