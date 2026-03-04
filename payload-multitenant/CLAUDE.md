@@ -270,41 +270,56 @@ O Admin UI fica disponível em `https://cms.alinhadamente.pt/admin` para gestão
 
 ### CORS — Configuração crítica
 
-Como os frontends estão em domínios diferentes (Cloudflare Pages), o CORS deve ser configurado no `payload.config.ts`:
+Como os frontends estão em domínios diferentes (Cloudflare Pages), o CORS deve ser configurado no `payload.config.ts`.
+
+**Localização:** `src/payload.config.ts` — linhas 30-51
 
 ```typescript
+// Production origins - always included
+const productionOrigins = [
+  'https://portal-propostas-alinhadamente.pages.dev',
+  'https://propostas.alinhadamente.pt',
+  'https://cms.alinhadamente.pt',
+  // Additional origins from env var
+  ...(process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+    : []),
+]
+
+const allowedOrigins = [...devOrigins, ...productionOrigins]
+
 export default buildConfig({
-  // ...
-  cors: {
-    origins: [
-      'https://alinhadamente.pt',
-      'https://www.alinhadamente.pt',
-      'https://propostas.alinhadamente.pt',
-      // Domínios de clientes
-      'https://advogados-silva.pt',
-      // Dev local
-      ...(process.env.NODE_ENV === 'development'
-        ? ['http://localhost:3001', 'http://localhost:4321']
-        : []),
-    ],
-  },
-  csrf: [
-    'https://alinhadamente.pt',
-    'https://www.alinhadamente.pt',
-    'https://propostas.alinhadamente.pt',
-    ...(process.env.NODE_ENV === 'development'
-      ? ['http://localhost:3001', 'http://localhost:4321']
-      : []),
-  ],
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   // ...
 })
 ```
 
-> **IMPORTANTE:** Quando adicionares um novo cliente/frontend, deves adicionar o domínio ao CORS e ao CSRF. Isto requer um redeploy do Payload. Para escalar, considera usar variáveis de ambiente para a lista de domínios:
+> ⚠️ **CRÍTICO:** Quando um novo cliente tiver um frontend que consome a API, o domínio DEVE ser adicionado ao CORS. Sem isso, o browser bloqueia os pedidos com erro "Failed to fetch".
 
-```typescript
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || []
+#### Como adicionar um novo domínio ao CORS
+
+**Opção 1: Via variável de ambiente (RECOMENDADO — sem alteração de código)**
+
+Adicionar no Dokploy (ou platform de deploy) a variável:
+```env
+ALLOWED_ORIGINS=https://cliente1.pt,https://www.cliente1.pt,https://outro.pt
 ```
+
+**Opção 2: Via código (requer redeploy)**
+
+Editar `src/payload.config.ts` e adicionar ao array `productionOrigins`:
+```typescript
+const productionOrigins = [
+  'https://portal-propostas-alinhadamente.pages.dev',
+  'https://propostas.alinhadamente.pt',
+  'https://cms.alinhadamente.pt',
+  'https://novo-cliente.pt',           // ← Adicionar aqui
+  // ...
+]
+```
+
+> 💡 **Dica:** Usar a Opção 1 (env var) permite escalar sem modificar código. Cada novo cliente é apenas uma configuração no servidor.
 
 ### Autenticação da API
 
@@ -876,10 +891,62 @@ Quando uma página React fica em branco sem mensagem de erro visível:
 - [ ] Configurar domínio e SSL
 
 ### Fase 5 — Onboarding de Clientes
-- [ ] Criar workflow para adicionar novo tenant
-- [ ] Documentar processo de ativação de módulos por tenant
+- [x] Criar workflow para adicionar novo tenant
+- [x] Documentar processo de ativação de módulos por tenant
 - [ ] Implementar dashboard por tenant
 - [ ] Criar templates de proposta padrão
+
+---
+
+## Onboarding de Novo Cliente — Checklist Completo
+
+Quando um novo cliente compra um serviço CMS/website, seguir esta checklist:
+
+### 1. DNS e Domínio
+- [ ] Confirmar domínio do cliente (ex: `cliente.pt`)
+- [ ] Configurar DNS na Cloudflare (ou pedir ao cliente para configurar)
+- [ ] Para subdomínios de propostas: criar CNAME `propostas.cliente.pt` → Cloudflare Pages
+
+### 2. CORS no Backend (CRÍTICO)
+- [ ] Adicionar domínio do frontend do cliente ao CORS
+- [ ] **Opção recomendada:** Adicionar via env var `ALLOWED_ORIGINS` no Dokploy
+- [ ] **Alternativa:** Editar `src/payload.config.ts` → `productionOrigins`
+- [ ] Redeploy do backend para aplicar
+
+### 3. Tenant no Payload CMS
+- [ ] Criar novo tenant em `/admin` → Tenants → Create
+- [ ] Preencher: nome, slug, domínio, plano
+- [ ] Configurar definições do tenant: logo, cor primária, email, telefone
+
+### 4. Utilizadores do Cliente
+- [ ] Criar utilizador(es) para o cliente em `/admin` → Users → Create
+- [ ] Associar ao tenant correto
+- [ ] Definir role apropriada (`tenantAdmin`, `tenantEditor`, etc.)
+- [ ] Enviar credenciais ao cliente (canal seguro)
+
+### 5. Frontend (se aplicável)
+- [ ] Criar/deployar frontend do cliente (Cloudflare Pages ou outro)
+- [ ] Configurar `VITE_API_URL=https://cms.alinhadamente.pt` no frontend
+- [ ] Testar conexão frontend → API
+
+### 6. Portal de Propostas (se contratado)
+- [ ] Verificar que o domínio do portal está no CORS (ex: `propostas.cliente.pt`)
+- [ ] Criar template de proposta base para o cliente
+- [ ] Testar criação e visualização de proposta
+
+### 7. Validação Final
+- [ ] Testar frontend do cliente — deve carregar sem erros de CORS
+- [ ] Verificar que dados do tenant aparecem corretamente
+- [ ] Confirmar que não há "Failed to fetch" na consola do browser
+
+### Troubleshooting Rápido
+
+| Sintoma | Causa Provável | Solução |
+|---------|----------------|---------|
+| "Failed to fetch" no browser | Domínio não está no CORS | Adicionar a `ALLOWED_ORIGINS` e redeploy |
+| Dados não aparecem | Tenant mal configurado | Verificar associação user-tenant |
+| 401 Unauthorized | API key inválida ou sem tenant | Regenerar API key, verificar tenant |
+| Uploads falham | Config S3 ou permissões | Verificar bucket, credentials, tenant do media |
 
 ---
 

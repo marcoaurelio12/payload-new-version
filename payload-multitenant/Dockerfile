@@ -30,6 +30,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+# Ensure public folder exists (for Docker COPY)
+RUN mkdir -p ./public
+
 # Generate import map for Payload plugins (multi-tenant, etc.)
 RUN \
   if [ -f yarn.lock ]; then yarn run generate:importmap; \
@@ -57,8 +60,9 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Remove this line if you do not have this folder
-COPY --from=builder /app/public ./public
+# Copy public folder (create empty if not exists)
+RUN mkdir -p ./public
+COPY --from=builder /app/public ./public/
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
@@ -69,29 +73,12 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy migrations folder for runtime migrations
-COPY --from=builder --chown=nextjs:nodejs /app/migrations ./migrations
-# Copy src for payload config (needed for migrations)
-COPY --from=builder --chown=nextjs:nodejs /app/src ./src
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-
-# Install pnpm for running migrations (minimal overhead)
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 
-# Create startup script that runs migrations before starting the server
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'echo "Running database migrations..."' >> /app/start.sh && \
-    echo 'pnpm payload migrate || echo "Migration warning - continuing startup"' >> /app/start.sh && \
-    echo 'echo "Starting server..."' >> /app/start.sh && \
-    echo 'exec HOSTNAME="0.0.0.0" node server.js' >> /app/start.sh && \
-    chmod +x /app/start.sh
-
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["/app/start.sh"]
+CMD HOSTNAME="0.0.0.0" node server.js
