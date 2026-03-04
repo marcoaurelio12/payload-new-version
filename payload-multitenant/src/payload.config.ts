@@ -31,6 +31,7 @@ const dirname = path.dirname(filename)
 // Production origins - always included
 const productionOrigins = [
   'https://portal-propostas-alinhadamente.pages.dev',
+  'https://propostas.alinhadamente.pt',
   'https://cms.alinhadamente.pt',
   // Additional origins from env var
   ...(process.env.ALLOWED_ORIGINS
