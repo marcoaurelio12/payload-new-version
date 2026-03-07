@@ -8,51 +8,69 @@ import {
   SparklesIcon,
   CheckIcon
 } from '@heroicons/react/24/solid';
-import { Proposal, PricingTier, PricingFeature } from '../types';
+import { Proposal, PricingTier, PricingFeature, PaymentModality } from '../types';
 import FeatureTooltip from './FeatureTooltip';
+import PaymentModalityToggle from './PaymentModalityToggle';
 
 interface CalculatorProps {
   proposal: Proposal;
-  onTotalChange: (setup: number, monthly: number) => void;
+  onTotalChange: (setup: number, monthly: number, modality: PaymentModality) => void;
 }
 
 const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
   // Find recommended tier or default to first
   const defaultTier = proposal.pricing.tiers?.find(t => t.recommended) || proposal.pricing.tiers?.[0];
-  
+
   const [selectedTier, setSelectedTier] = useState<PricingTier | null>(defaultTier || null);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [expandedAddOnId, setExpandedAddOnId] = useState<string | null>(null);
+  const [paymentModality, setPaymentModality] = useState<PaymentModality>('annual');
 
   const tiers = proposal.pricing.tiers || [];
   const addons = proposal.addons_disponiveis || [];
 
+  // Apply payment modality multiplier
+  const applyModalityMultiplier = (basePrice: number): number => {
+    return paymentModality === 'monthly'
+      ? Math.round(basePrice * 1.23)  // 23% markup for monthly
+      : basePrice;                     // No markup for annual
+  };
+
   // Calculate Totals
   const calculateTotals = () => {
-    let setup = 0;
-    let monthly = 0;
+    let baseSetup = 0;
+    let baseMonthly = 0;
 
     if (selectedTier) {
-      setup += selectedTier.setup_price;
-      monthly += selectedTier.monthly_price;
+      baseSetup += selectedTier.setup_price;
+      baseMonthly += selectedTier.monthly_price;
     } else {
-      setup += proposal.pricing.setupPrice;
-      monthly += proposal.pricing.monthlyBase;
+      baseSetup += proposal.pricing.setupPrice;
+      baseMonthly += proposal.pricing.monthlyBase;
     }
 
     const selectedAddonData = addons.filter(a => selectedAddOns.includes(a.id));
-    setup += selectedAddonData.reduce((sum, a) => sum + a.setup_price, 0);
-    monthly += selectedAddonData.reduce((sum, a) => sum + a.monthly_price, 0);
+    baseSetup += selectedAddonData.reduce((sum, a) => sum + a.setup_price, 0);
+    baseMonthly += selectedAddonData.reduce((sum, a) => sum + a.monthly_price, 0);
 
-    return { setup, monthly };
+    // Apply modality multiplier to monthly price
+    const displayMonthly = applyModalityMultiplier(baseMonthly);
+    const annualTotal = baseMonthly * 12;
+
+    return {
+      setup: baseSetup,
+      monthly: displayMonthly,
+      baseMonthly,      // Original price without markup
+      annualTotal       // Annual commitment (base × 12)
+    };
   };
 
   const totals = calculateTotals();
 
   // Notify parent of total changes (for sticky footer etc)
   useEffect(() => {
-    onTotalChange(totals.setup, totals.monthly);
-  }, [totals.setup, totals.monthly]);
+    onTotalChange(totals.setup, totals.monthly, paymentModality);
+  }, [totals.setup, totals.monthly, paymentModality]);
 
   const toggleAddOn = (id: string) => {
     setSelectedAddOns(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
@@ -71,6 +89,15 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
       <div className="p-8 lg:p-12">
         <h2 className="text-4xl font-fluent text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">Investimento</h2>
         <p className="text-gray-600 dark:text-[#D1D1D1]/60 mb-10 transition-colors">Configure o nível de serviço e os extras da sua infraestrutura.</p>
+
+        {/* STEP 0: PAYMENT MODALITY */}
+        <div className="mb-10">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-[#41CE2A] mb-4">Modalidade de Pagamento</h3>
+          <PaymentModalityToggle
+            value={paymentModality}
+            onChange={setPaymentModality}
+          />
+        </div>
 
         {/* STEP 1: TIERS */}
         {tiers.length > 0 && (
@@ -111,9 +138,18 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                       <p className="text-3xl font-fluent text-gray-900 dark:text-white mb-1">
                         {tier.setup_price}€ <span className="text-xs text-gray-400 font-bold uppercase">Setup</span>
                       </p>
-                      <p className="text-lg text-gray-500 dark:text-[#D1D1D1]/60">
-                        {tier.monthly_price}€ <span className="text-[10px] uppercase font-bold">/mês</span>
-                      </p>
+                      {paymentModality === 'annual' ? (
+                        <div className="text-lg text-gray-500 dark:text-[#D1D1D1]/60">
+                          <span className="text-[10px] uppercase font-bold text-[#41CE2A]">{(tier.monthly_price * 12).toLocaleString('pt-PT')}€/ano</span>
+                          <span className="mx-1">•</span>
+                          <span>{tier.monthly_price}€/mês</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg text-gray-500 dark:text-[#D1D1D1]/60">
+                          {applyModalityMultiplier(tier.monthly_price)}€ <span className="text-[10px] uppercase font-bold">/mês</span>
+                          <span className="ml-2 text-[9px] text-gray-400 font-bold">+23%</span>
+                        </p>
+                      )}
                     </div>
 
                     {/* Features List - Always Visible */}
@@ -223,7 +259,7 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                                             </div>
                                             {addon.third_party_costs && (
                                             <div className="space-y-2">
-                                                <p className="text-[10px] font-black uppercase text-amber-500/80">Custos de Terceiros</p>
+                                                <p className="text-[10px] font-black uppercase text-gray-400/80">Custos de Terceiros</p>
                                                 <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: addon.third_party_costs }} />
                                             </div>
                                             )}
@@ -266,11 +302,29 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                         </div>
 
                         <div className="pt-4 border-t border-black/5 dark:border-white/5 space-y-1">
-                             <p className="text-[10px] font-black text-[#41CE2A] uppercase tracking-[0.2em]">Total Mensal</p>
-                             <div className="flex items-baseline space-x-2">
-                                <span className="text-5xl font-fluent text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.monthly}</span>
-                                <span className="text-xl font-bold text-gray-400 dark:text-[#D1D1D1]/40 transition-colors">€</span>
-                             </div>
+                             {paymentModality === 'annual' ? (
+                               <>
+                                 <p className="text-[10px] font-black text-[#41CE2A] uppercase tracking-[0.2em]">Compromisso Anual</p>
+                                 <div className="flex items-baseline space-x-2">
+                                    <span className="text-5xl font-fluent text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.annualTotal.toLocaleString('pt-PT')}</span>
+                                    <span className="text-xl font-bold text-gray-400 dark:text-[#D1D1D1]/40 transition-colors">€/ano</span>
+                                 </div>
+                                 <p className="text-sm text-[#41CE2A] font-bold mt-1">
+                                    {totals.baseMonthly}€/mês equivalente
+                                 </p>
+                               </>
+                             ) : (
+                               <>
+                                 <p className="text-[10px] font-black text-[#41CE2A] uppercase tracking-[0.2em]">Total Mensal</p>
+                                 <div className="flex items-baseline space-x-2">
+                                    <span className="text-5xl font-fluent text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.monthly}</span>
+                                    <span className="text-xl font-bold text-gray-400 dark:text-[#D1D1D1]/40 transition-colors">€/mês</span>
+                                 </div>
+                                 <p className="text-xs text-gray-400 font-bold mt-1">
+                                    Inclui +23% (flexibilidade mensal)
+                                 </p>
+                               </>
+                             )}
                         </div>
                     </div>
                 </div>

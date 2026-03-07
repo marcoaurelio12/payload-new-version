@@ -473,7 +473,7 @@ const AppTailwind: React.FC = () => {
                 <Suspense fallback={<SectionLoader />}>
                   <Calculator
                     proposal={proposal as any}
-                    onTotalChange={() => { /* tracked internally */ }}
+                    onTotalChange={(_setup, _monthly, _modality) => { /* tracked internally */ }}
                   />
                 </Suspense>
               </section>

@@ -22,10 +22,13 @@ import {
 } from '@heroicons/react/24/outline';
 import { useProposal, useProposalSlugFromUrl } from './hooks/useProposal';
 import Logo from './components/Logo';
+import PaymentModalityToggle from './components/PaymentModalityToggle';
 
 // ============================================
 // TYPES
 // ============================================
+type PaymentModality = 'monthly' | 'annual';
+
 interface PricingTier {
   id: string;
   name: string;
@@ -233,7 +236,6 @@ const Hero: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         {proposal.hero.description && (
           <p className="text-xl text-gray-600 dark:text-gray-1 mb-10 leading-relaxed font-light transition-colors">
             {proposal.hero.description}
-          </p>
         )}
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <button
@@ -242,6 +244,7 @@ const Hero: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           >
             Explorar Solução
           </button>
+                      </p>
         </div>
       </motion.div>
 
@@ -277,6 +280,7 @@ const Hero: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           </div>
         </motion.div>
       )}
+                      </p>
     </div>
   );
 };
@@ -331,7 +335,6 @@ const DiagnosticSection: React.FC<{ diagnostic: Diagnostic }> = ({ diagnostic })
           </h3>
           <p className="text-gray-600 dark:text-gray-1 leading-relaxed font-mono text-sm opacity-80 transition-colors">
             {diagnostic.problem}
-          </p>
         </div>
       </div>
 
@@ -346,7 +349,6 @@ const DiagnosticSection: React.FC<{ diagnostic: Diagnostic }> = ({ diagnostic })
           </h3>
           <p className="text-gray-700 dark:text-white leading-relaxed font-mono text-sm transition-colors">
             {diagnostic.solution}
-          </p>
         </div>
       </div>
 
@@ -476,7 +478,6 @@ const CmsMotors: React.FC<{ motors: CmsMotor[] }> = ({ motors }) => {
             </h3>
             <p className="text-gray-600 dark:text-gray-1/80 text-sm leading-relaxed mb-4 transition-colors">
               {motor.description}
-            </p>
 
             <AnimatePresence>
               {expandedId === motor.id && motor.features && (
@@ -500,6 +501,7 @@ const CmsMotors: React.FC<{ motors: CmsMotor[] }> = ({ motors }) => {
             </AnimatePresence>
           </motion.div>
         ))}
+                      </p>
       </div>
     </div>
   );
@@ -510,41 +512,58 @@ const CmsMotors: React.FC<{ motors: CmsMotor[] }> = ({ motors }) => {
 // ============================================
 const Calculator: React.FC<{
   proposal: Proposal;
-  onTotalChange: (setup: number, monthly: number) => void;
+  onTotalChange: (setup: number, monthly: number, modality: PaymentModality) => void;
 }> = ({ proposal, onTotalChange }) => {
   const defaultTier = proposal.pricing.tiers?.find(t => t.recommended) || proposal.pricing.tiers?.[0];
 
   const [selectedTier, setSelectedTier] = useState<PricingTier | null>(defaultTier || null);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [expandedAddOnId, setExpandedAddOnId] = useState<string | null>(null);
+  const [paymentModality, setPaymentModality] = useState<PaymentModality>('annual');
 
   const tiers = proposal.pricing.tiers || [];
   const addons = proposal.addons_disponiveis || [];
 
+  // Apply payment modality multiplier
+  const applyModalityMultiplier = (basePrice: number): number => {
+    return paymentModality === 'monthly'
+      ? Math.round(basePrice * 1.23)  // 23% markup for monthly
+      : basePrice;                     // No markup for annual
+  };
+
   const calculateTotals = () => {
-    let setup = 0;
-    let monthly = 0;
+    let baseSetup = 0;
+    let baseMonthly = 0;
 
     if (selectedTier) {
-      setup += selectedTier.setup_price;
-      monthly += selectedTier.monthly_price;
+      baseSetup += selectedTier.setup_price;
+      baseMonthly += selectedTier.monthly_price;
     } else {
-      setup += proposal.pricing.setupPrice;
-      monthly += proposal.pricing.monthlyBase;
+      baseSetup += proposal.pricing.setupPrice;
+      baseMonthly += proposal.pricing.monthlyBase;
     }
 
     const selectedAddonData = addons.filter(a => selectedAddOns.includes(a.id));
-    setup += selectedAddonData.reduce((sum, a) => sum + a.setup_price, 0);
-    monthly += selectedAddonData.reduce((sum, a) => sum + a.monthly_price, 0);
+    baseSetup += selectedAddonData.reduce((sum, a) => sum + a.setup_price, 0);
+    baseMonthly += selectedAddonData.reduce((sum, a) => sum + a.monthly_price, 0);
 
-    return { setup, monthly };
+    // Apply modality multiplier to monthly price
+    const displayMonthly = applyModalityMultiplier(baseMonthly);
+    const annualTotal = baseMonthly * 12;
+
+    return {
+      setup: baseSetup,
+      monthly: displayMonthly,
+      baseMonthly,      // Original price without markup
+      annualTotal       // Annual commitment (base × 12)
+    };
   };
 
   const totals = calculateTotals();
 
   useEffect(() => {
-    onTotalChange(totals.setup, totals.monthly);
-  }, [totals.setup, totals.monthly]);
+    onTotalChange(totals.setup, totals.monthly, paymentModality);
+  }, [totals.setup, totals.monthly, paymentModality]);
 
   const toggleAddOn = (id: string) => {
     setSelectedAddOns(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
@@ -562,6 +581,15 @@ const Calculator: React.FC<{
       <div className="p-8 lg:p-12">
         <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight transition-colors">Investimento</h2>
         <p className="text-gray-600 dark:text-gray-1/60 mb-10 transition-colors">Configure o nível de serviço e os extras da sua infraestrutura.</p>
+
+        {/* STEP 0: PAYMENT MODALITY */}
+        <div className="mb-10">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-primary mb-4">Modalidade de Pagamento</h3>
+          <PaymentModalityToggle
+            value={paymentModality}
+            onChange={setPaymentModality}
+          />
+        </div>
 
         {/* STEP 1: TIERS */}
         {tiers.length > 0 && (
@@ -598,14 +626,25 @@ const Calculator: React.FC<{
                       ) : (
                         <div className="w-6 h-6 rounded-full border border-gray-300 dark:border-white/20"></div>
                       )}
+                      </p>
                     </div>
 
                     <div className="mb-6 pb-6 border-b border-black/5 dark:border-white/5">
                       <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                         {tier.setup_price}€ <span className="text-xs text-gray-400 font-bold uppercase">Setup</span>
-                      </p>
                       <p className="text-lg text-gray-500 dark:text-gray-1/60">
-                        {tier.monthly_price}€ <span className="text-[10px] uppercase font-bold">/mês</span>
+                      {paymentModality === 'annual' ? (
+                        <>
+                          <span className="text-[10px] uppercase font-bold text-primary">{(tier.monthly_price * 12).toLocaleString('pt-PT')}€/ano</span>
+                          <span className="mx-1">•</span>
+                          <span>{tier.monthly_price}€/mês</span>
+                        </>
+                      ) : (
+                        <>
+                          {applyModalityMultiplier(tier.monthly_price)}€ <span className="text-[10px] uppercase font-bold">/mês</span>
+                          <span className="ml-2 text-[9px] text-gray-400 font-bold">+23%</span>
+                        </>
+                      )}
                       </p>
                     </div>
 
@@ -658,6 +697,7 @@ const Calculator: React.FC<{
                         <div>
                           <p className="text-[10px] text-primary font-black uppercase tracking-wider">Tempo Poupado</p>
                           <p className="text-xl font-bold text-gray-900 dark:text-white transition-colors">{roiStats.hoursSaved}h <span className="text-xs text-gray-500 dark:text-white/50">/mês</span></p>
+                      </p>
                         </div>
                       </div>
                       <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl flex items-center space-x-3">
@@ -678,6 +718,7 @@ const Calculator: React.FC<{
                         <div className="flex items-center space-x-5">
                           <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${selectedAddOns.includes(addon.id) ? 'bg-primary' : 'bg-black/10 dark:bg-white/10'}`}>
                             {selectedAddOns.includes(addon.id) && <CheckCircleIcon className="w-5 h-5 text-gray-900" />}
+                      </p>
                           </div>
                           <div>
                             <div className="flex items-center space-x-2">
@@ -709,11 +750,13 @@ const Calculator: React.FC<{
                           </motion.div>
                         )}
                       </AnimatePresence>
+                      </p>
                     </div>
                   ))}
                 </div>
               </>
             )}
+                      </p>
           </div>
 
           {/* STEP 3: SUMMARY */}
@@ -740,17 +783,34 @@ const Calculator: React.FC<{
                   <div className="flex items-baseline space-x-2">
                     <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.setup}</span>
                     <span className="text-xl font-bold text-gray-400 dark:text-gray-1/40 transition-colors">€</span>
+                      </p>
                   </div>
                 </div>
-
                 <div className="pt-4 border-t border-black/5 dark:border-white/5 space-y-1">
-                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Total Mensal</p>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.monthly}</span>
-                    <span className="text-xl font-bold text-gray-400 dark:text-gray-1/40 transition-colors">€</span>
-                  </div>
+                  {paymentModality === 'annual' ? (
+                    <>
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Compromisso Anual</p>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.annualTotal?.toLocaleString('pt-PT')}</span>
+                        <span className="text-xl font-bold text-gray-400 dark:text-gray-1/40 transition-colors">€/ano</span>
+                      </div>
+                      <p className="text-sm text-primary font-bold mt-1">
+                        {totals.baseMonthly}€/mês equivalente
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Total Mensal</p>
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-tighter transition-colors">{totals.monthly}</span>
+                        <span className="text-xl font-bold text-gray-400 dark:text-gray-1/40 transition-colors">€/mês</span>
+                      </div>
+                      <p className="text-xs text-gray-400 font-bold mt-1">
+                        Inclui +23% (flexibilidade mensal)
+                      </p>
+                    </>
+                  )}
                 </div>
-              </div>
             </div>
 
             <div className="mt-8">
@@ -760,7 +820,6 @@ const Calculator: React.FC<{
               </button>
               <p className="text-center text-[10px] text-gray-400 dark:text-gray-1/30 mt-4 uppercase tracking-widest transition-colors">
                 Valores s/ IVA • Pagamento 50% na Confirmação
-              </p>
             </div>
           </div>
         </div>
@@ -782,7 +841,6 @@ const VariableCostsAccordion: React.FC<{ costs: VariableCost[] }> = ({ costs }) 
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight transition-colors">Custos Variáveis Externos</h2>
           <p className="text-xs text-gray-500 dark:text-gray-1/40 mt-2 max-w-md transition-colors">
             Estes valores são pagos diretamente aos fornecedores (Hosting, Domínios, APIs). A Alinhadamente configura, mas a faturação é em seu nome.
-          </p>
         </div>
         <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center space-x-3">
           <InformationCircleIcon className="w-5 h-5 text-primary" />
@@ -826,6 +884,7 @@ const VariableCostsAccordion: React.FC<{ costs: VariableCost[] }> = ({ costs }) 
               ))}
             </tbody>
           </table>
+                      </p>
         </div>
       </div>
     </div>
@@ -846,7 +905,6 @@ const FAQSection: React.FC<{ faqs: Faq[] }> = ({ faqs }) => {
         <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-8 transition-colors">Deveres & Direitos</h2>
         <p className="text-gray-600 dark:text-gray-1/60 text-lg font-light leading-relaxed transition-colors">
           Transparência radical é o nosso pilar. Como uma agência focada em Legal Tech, os nossos acordos são claros, justos e orientados à soberania digital da sua Sociedade.
-        </p>
         <div className="mt-12 flex items-center space-x-4">
           <div className="p-4 bg-primary/10 rounded-2xl">
             <ShieldCheckIcon className="w-8 h-8 text-primary" />
@@ -874,6 +932,7 @@ const FAQSection: React.FC<{ faqs: Faq[] }> = ({ faqs }) => {
                 ) : (
                   <PlusIcon className="w-5 h-5 text-gray-400 dark:text-gray-1/30 transition-colors" />
                 )}
+                      </p>
               </div>
             </button>
             <AnimatePresence>
@@ -886,10 +945,10 @@ const FAQSection: React.FC<{ faqs: Faq[] }> = ({ faqs }) => {
                 >
                   <p className="text-gray-600 dark:text-gray-1/60 leading-relaxed pt-2 transition-colors">
                     {faq.answer}
-                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
+                      </p>
           </div>
         ))}
       </div>
@@ -946,7 +1005,6 @@ const Adjudication: React.FC<{ proposalSlug: string }> = ({ proposalSlug }) => {
             </h2>
             <p className="text-gray-600 dark:text-gray-1 mb-12 text-lg max-w-xl mx-auto font-light transition-colors">
               Ao confirmar a proposta, o seu gestor de conta será notificado para dar início aos procedimentos de contrato e setup.
-            </p>
 
             <button
               disabled={isSubmitting}
@@ -978,18 +1036,19 @@ const Adjudication: React.FC<{ proposalSlug: string }> = ({ proposalSlug }) => {
               <svg className="w-12 h-12 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
+                      </p>
             </div>
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Excelente escolha.</h2>
             <p className="text-gray-600 dark:text-gray-1 text-lg mb-8 max-w-lg mx-auto leading-relaxed transition-colors">
               O seu interesse foi registado com sucesso. <br />
               <span className="text-primary font-bold">Entraremos em contacto brevemente.</span>
-            </p>
             <div className="inline-block px-4 py-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/10 dark:border-white/10 text-xs font-mono text-gray-500 dark:text-gray-1/60 uppercase tracking-widest transition-colors">
               REF: {proposalSlug.toUpperCase()}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+                      </p>
     </div>
   );
 };
@@ -1055,6 +1114,7 @@ const AppTailwind: React.FC = () => {
                 <div className="text-center mb-12">
                   <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">Diagnóstico de Impacto</h2>
                   <p className="text-gray-600 dark:text-gray-1/60 transition-colors">Análise comparativa da infraestrutura atual vs. proposta.</p>
+                      </p>
                 </div>
                 <DiagnosticSection diagnostic={proposal.diagnostic} />
               </section>
@@ -1066,6 +1126,7 @@ const AppTailwind: React.FC = () => {
                 <div className="text-center mb-16">
                   <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">Plano de Ação Mútuo</h2>
                   <p className="text-gray-600 dark:text-gray-1/60 transition-colors">Alinhamento de responsabilidades para garantir o sucesso do projeto.</p>
+                      </p>
                 </div>
                 <Roadmap phases={proposal.roadmap_phases} />
               </section>
@@ -1078,7 +1139,7 @@ const AppTailwind: React.FC = () => {
                   <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Arquitetura de Performance</h2>
                   <p className="text-gray-600 dark:text-gray-1 text-lg max-w-2xl mx-auto font-light transition-colors">
                     Sistemas projetados para {proposal.client.name}.
-                  </p>
+                      </p>
                 </div>
                 <CmsMotors motors={proposal.motores_incluidos} />
               </section>
@@ -1087,7 +1148,7 @@ const AppTailwind: React.FC = () => {
             <section id="investimento">
               <Calculator
                 proposal={proposal}
-                onTotalChange={(setup, monthly) => console.log(setup, monthly)}
+                onTotalChange={(setup, monthly, modality) => console.log(setup, monthly, modality)}
               />
             </section>
 
@@ -1120,9 +1181,11 @@ const AppTailwind: React.FC = () => {
                   <img src={proposal.team[0].image_url} alt={proposal.team[0].name} className="w-5 h-5 rounded-full object-cover" />
                 )}
                 <span className="font-bold text-gray-900 dark:text-white">{proposal.team[0].name}</span>
+                      </p>
               </div>
             </div>
           )}
+                      </p>
         </div>
       </footer>
     </div>

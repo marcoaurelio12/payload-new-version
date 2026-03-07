@@ -1,4 +1,7 @@
 
+// Payment Modality Types
+export type PaymentModality = 'monthly' | 'annual';
+
 export interface RichText {
   [key: string]: any;
 }
