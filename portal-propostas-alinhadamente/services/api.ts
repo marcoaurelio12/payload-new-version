@@ -74,7 +74,7 @@ export interface ApiProposal {
       name: string;
       setupPrice: number;       // camelCase from backend
       monthlyPrice: number;     // camelCase from backend
-      features: Array<{ feature: string }>;  // Nested objects from backend
+      features: Array<{ feature: string; tooltip?: string }>;  // Nested objects from backend
       recommended?: boolean;
     }>;
     items?: Array<{
@@ -151,7 +151,7 @@ export interface ApiProposal {
   variableCosts?: Array<{
     id: string;
     name: string;
-    estimated_cost: number;
+    estimatedCost: number;        // camelCase from backend
     description: string;
     required: boolean;
   }>;
@@ -205,7 +205,10 @@ export function transformApiProposal(apiProposal: ApiProposal): { proposal: Prop
       name: tier.name,
       setup_price: tier.setupPrice,      // camelCase → snake_case
       monthly_price: tier.monthlyPrice,  // camelCase → snake_case
-      features: tier.features?.map(f => f.feature) || [],  // [{feature: "x"}] → ["x"]
+      features: tier.features?.map(f => ({
+        text: f.feature,
+        tooltip: f.tooltip || undefined
+      })) || [],
       recommended: tier.recommended
     })) as PricingTier[] | undefined
   };
@@ -258,11 +261,11 @@ export function transformApiProposal(apiProposal: ApiProposal): { proposal: Prop
     order: i.order
   }));
 
-  // Map variable costs
+  // Map variable costs - Transform camelCase to snake_case
   const variable_costs: VariableCost[] = (apiProposal.variableCosts || []).map(v => ({
     id: v.id,
     name: v.name,
-    estimated_cost: v.estimated_cost,
+    estimated_cost: v.estimatedCost,  // camelCase → snake_case
     description: v.description,
     required: v.required
   }));

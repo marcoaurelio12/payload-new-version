@@ -16,18 +16,33 @@ portal-propostas-alinhadamente/
 
 ## Running Both Projects
 
+### Quick Start
+
 ```bash
 # Terminal 1: Backend (Payload CMS) - runs on port 3000
 cd payload-multitenant
-docker compose up -d          # Start PostgreSQL locally
+docker compose up -d postgres   # Start ONLY PostgreSQL (not the payload container!)
 pnpm install
-pnpm dev
+pnpm dev                        # Run backend LOCALLY, not in Docker
 
 # Terminal 2: Frontend (Proposal Portal) - runs on port 3005
 cd portal-propostas-alinhadamente
 npm install
 npm run dev
 ```
+
+### ⚠️ IMPORTANT: Docker Setup
+
+The `docker-compose.yml` in `payload-multitenant/` has TWO services:
+- `postgres` - PostgreSQL database (**NEEDED** for local dev)
+- `payload` - Runs `pnpm dev` inside Docker (**DO NOT USE** for local dev)
+
+**For local development:**
+1. Run `docker compose up -d postgres` to start ONLY the database
+2. Run `pnpm dev` locally in your terminal (NOT inside Docker)
+3. The payload container causes port conflicts and connection issues
+
+**Why?** The `payload` Docker service tries to connect to PostgreSQL using `localhost:5432`, but inside Docker, `localhost` refers to the container itself, not the host machine. Running locally avoids this issue.
 
 ## Project Commands
 
@@ -86,14 +101,43 @@ npm run dev
    - `POST /api/proposals/public/:slug/reject` - Reject proposal
 
 2. **Data Transformation Layer** - The frontend transforms backend responses:
-   - Backend uses camelCase (`setupPrice`, `monthlyPrice`)
-   - Frontend expects snake_case (`setup_price`, `monthly_price`)
-   - Array structures are flattened: `[{ feature: "text" }]` → `["text"]`
-   - See `portal-propostas-alinhadamente/services/api.ts` for transformer
+
+   **Field Naming:**
+   | Backend (Payload) | Frontend |
+   |-------------------|----------|
+   | `setupPrice` | `setup_price` |
+   | `monthlyPrice` | `monthly_price` |
+   | `hoursSaved` | `hours_saved` |
+
+   **Array Flattening** (Payload stores arrays as objects):
+   ```typescript
+   // Backend sends:
+   features: [{ feature: "Text" }, { feature: "Text 2" }]
+
+   // Frontend expects:
+   features: ["Text", "Text 2"]
+   ```
+
+   **Files affected:**
+   - `portal-propostas-alinhadamente/services/api.ts` - `transformApiProposal()` function
+   - `portal-propostas-alinhadamente/types.ts` - TypeScript interfaces
 
 3. **Environment Variables**:
-   - Frontend: `VITE_API_URL=http://localhost:3000`
-   - Backend: See `payload-multitenant/.env.example`
+
+   **Frontend** (`portal-propostas-alinhadamente/.env.local`):
+   ```env
+   VITE_API_URL=http://localhost:3000
+   VITE_DEFAULT_SLUG=marquesevieira
+   VITE_USE_MOCK=false
+   ```
+
+   **Backend** (`payload-multitenant/.env.local`):
+   ```env
+   DATABASE_URL=postgresql://payload_dev:dev_password_local@localhost:5432/payload_dev
+   PAYLOAD_SECRET=<32-char-secret>
+   NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+   NODE_ENV=development
+   ```
 
 ## Critical Patterns
 
@@ -119,6 +163,82 @@ Usually caused by data structure mismatches:
 1. Check browser console for JavaScript errors
 2. Look for `.map()` on undefined/non-array data
 3. Verify transformer handles new fields correctly
+
+## Troubleshooting
+
+### Port 3000 Already in Use
+
+**Cause:** The Docker `payload` container is running or another process is using port 3000.
+
+**Solution:**
+```bash
+# Stop the Docker payload container
+docker stop payload-multitenant-payload-1
+docker rm payload-multitenant-payload-1
+
+# Or kill all node processes (nuclear option)
+taskkill //F //IM node.exe  # Windows
+pkill -f node               # Linux/Mac
+
+# Then restart
+pnpm dev
+```
+
+### React Server Components Error
+
+**Error:** `Could not find the module ... in the React Client Manifest`
+
+**Solution:** Clear the Next.js cache and restart:
+```bash
+cd payload-multitenant
+rm -rf .next
+pnpm dev
+```
+
+### Database Connection Refused
+
+**Error:** `connect ECONNREFUSED 127.0.0.1:5432`
+
+**Cause:** PostgreSQL container is not running.
+
+**Solution:**
+```bash
+cd payload-multitenant
+docker compose up -d postgres
+```
+
+### CORS Errors in Frontend
+
+**Error:** `Failed to fetch` or CORS errors in browser console.
+
+**Cause:** Frontend domain not in backend's allowed origins.
+
+**Solution:** Add the domain to `payload-multitenant/src/payload.config.ts` in the `cors` and `csrf` arrays, or set `ALLOWED_ORIGINS` environment variable.
+
+## Key Files
+
+### Backend (payload-multitenant)
+
+| File | Purpose |
+|------|---------|
+| `src/payload.config.ts` | Main Payload configuration, CORS, plugins |
+| `src/collections/Proposals.ts` | Proposal schema definition |
+| `src/collections/core/Tenants.ts` | Multi-tenant configuration |
+| `src/collections/core/Users.ts` | User roles and auth |
+| `docker-compose.yml` | Local PostgreSQL (and payload container - don't use) |
+| `.env.local` | Local environment variables |
+
+### Frontend (portal-propostas-alinhadamente)
+
+| File | Purpose |
+|------|---------|
+| `services/api.ts` | API client and **data transformer** (critical) |
+| `types.ts` | TypeScript interfaces |
+| `hooks/useProposal.ts` | React hook for fetching proposals |
+| `App.tsx` | Main orchestrator, state management |
+| `components/PricingTiers.tsx` | Tier selection component |
+| `components/Calculator.tsx` | Investment calculator |
+| `.env.local` | Local environment variables |
 
 ## Detailed Documentation
 

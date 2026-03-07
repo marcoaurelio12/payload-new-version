@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { SparklesIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { Proposal, PricingTier, AddOn } from '../../types';
+import { Proposal, PricingTier, PricingFeature, AddOn } from '../../types';
 import Token from '../Token';
+import FeatureTooltip from '../FeatureTooltip';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface PricingExpressProps {
@@ -48,12 +49,18 @@ const PricingExpress: React.FC<PricingExpressProps> = ({
         </div>
 
         <ul className="space-y-3 mb-8">
-          {selectedTier.features.slice(0, 5).map((feat, i) => (
-            <li key={i} className="flex items-center gap-3">
-              <CheckIcon className="w-5 h-5 text-primary flex-shrink-0" />
-              <span className="text-p2 text-gray-4">{feat}</span>
-            </li>
-          ))}
+          {selectedTier.features.slice(0, 5).map((feat, i) => {
+            // Handle both string (legacy) and object (new) formats
+            const featureText = typeof feat === 'string' ? feat : (feat as { text: string; tooltip?: string }).text;
+            const featureTooltip = typeof feat === 'string' ? undefined : (feat as { text: string; tooltip?: string }).tooltip;
+
+            return (
+              <li key={i} className="flex items-center gap-3">
+                <CheckIcon className="w-5 h-5 text-primary shrink-0" />
+                <FeatureTooltip text={featureText} tooltip={featureTooltip} />
+              </li>
+            );
+          })}
         </ul>
       </div>
 

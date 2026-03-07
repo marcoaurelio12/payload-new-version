@@ -51,12 +51,17 @@ export interface AddOn {
   third_party_costs?: string;
 }
 
+export interface PricingFeature {
+  text: string;
+  tooltip?: string;
+}
+
 export interface PricingTier {
   id: string;
   name: string;
   setup_price: number;
   monthly_price: number;
-  features: string[];
+  features: PricingFeature[];
   recommended?: boolean;
 }
 

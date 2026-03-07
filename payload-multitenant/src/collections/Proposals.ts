@@ -279,6 +279,13 @@ export const Proposals: CollectionConfig = {
                   type: 'text',
                   required: true,
                 },
+                {
+                  name: 'tooltip',
+                  type: 'text',
+                  admin: {
+                    description: 'Texto explicativo opcional que aparece ao passar o rato por cima da feature',
+                  },
+                },
               ],
             },
             {

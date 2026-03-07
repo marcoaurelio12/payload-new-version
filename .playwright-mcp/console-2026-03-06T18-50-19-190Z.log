@@ -1,0 +1,4 @@
+[     349ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3001/api/proposals/public/marquesevieira/exists:0
+[     350ms] [ERROR] Failed to check proposal: Error: Proposta não encontrada
+    at checkProposalExists (http://localhost:3005/services/api.ts:206:13)
+    at async checkExists (http://localhost:3005/hooks/useProposalAuth.ts:28:25) @ http://localhost:3005/hooks/useProposalAuth.ts:71

@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  CheckCircleIcon, 
-  ClockIcon, 
+import {
+  CheckCircleIcon,
+  ClockIcon,
   ArrowTrendingUpIcon,
   SparklesIcon,
-  CheckIcon,
-  ShieldCheckIcon
+  CheckIcon
 } from '@heroicons/react/24/solid';
-import { Proposal, PricingTier } from '../types';
+import { Proposal, PricingTier, PricingFeature } from '../types';
+import FeatureTooltip from './FeatureTooltip';
 
 interface CalculatorProps {
   proposal: Proposal;
@@ -83,13 +83,11 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                   <motion.div
                     key={tier.id}
                     layout
-                    onClick={() => setSelectedTier(tier)}
-                    className={`relative p-8 rounded-2xl border-2 cursor-pointer transition-all duration-300 flex flex-col h-full ${
-                      isSelected 
-                        ? 'border-[#41CE2A] bg-[#41CE2A]/5 z-10 ring-1 ring-[#41CE2A]' 
-                        : 'border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02] hover:border-black/10'
+                    className={`relative p-8 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full ${
+                      isSelected
+                        ? 'border-[#41CE2A] bg-[#41CE2A]/5 z-10 ring-1 ring-[#41CE2A]'
+                        : 'border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]'
                     }`}
-                    whileHover={{ scale: 1.02 }}
                   >
                     {tier.recommended && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#41CE2A] text-[#1F1F1F] text-[10px] font-black uppercase px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
@@ -124,19 +122,27 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                         O que inclui:
                       </p>
                       <ul className="space-y-3 mb-6">
-                        {tier.features.map((feat, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <CheckIcon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isSelected ? 'text-[#41CE2A]' : 'text-gray-400'}`} />
-                            <span className="text-sm text-gray-700 dark:text-[#D1D1D1] leading-tight">{feat}</span>
-                          </li>
-                        ))}
+                        {tier.features.map((feat, idx) => {
+                          // Handle both string (legacy) and object (new) formats
+                          const featureText = typeof feat === 'string' ? feat : (feat as PricingFeature).text;
+                          const featureTooltip = typeof feat === 'string' ? undefined : (feat as PricingFeature).tooltip;
+
+                          return (
+                            <li key={idx} className="flex items-start gap-3">
+                              <CheckIcon className={`w-4 h-4 shrink-0 mt-0.5 ${isSelected ? 'text-[#41CE2A]' : 'text-gray-400'}`} />
+                              <FeatureTooltip text={featureText} tooltip={featureTooltip} />
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
 
-                    <button className={`w-full py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors ${
-                      isSelected 
-                        ? 'bg-[#41CE2A] text-[#1F1F1F]' 
-                        : 'bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/50 group-hover:bg-black/10'
+                    <button
+                      onClick={() => setSelectedTier(tier)}
+                      className={`w-full py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors ${
+                      isSelected
+                        ? 'bg-[#41CE2A] text-[#1F1F1F]'
+                        : 'bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/50 hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer'
                     }`}>
                       {isSelected ? 'Selecionado' : 'Selecionar'}
                     </button>

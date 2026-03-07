@@ -587,6 +587,10 @@ export interface Proposal {
           features?:
             | {
                 feature: string;
+                /**
+                 * Texto explicativo opcional que aparece ao passar o rato por cima da feature
+                 */
+                tooltip?: string | null;
                 id?: string | null;
               }[]
             | null;
@@ -1515,6 +1519,7 @@ export interface ProposalsSelect<T extends boolean = true> {
                 | T
                 | {
                     feature?: T;
+                    tooltip?: T;
                     id?: T;
                   };
               recommended?: T;
