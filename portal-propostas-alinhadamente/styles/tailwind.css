@@ -1,3 +1,4 @@
+@import "./raela-fonts.css";
 @import "tailwindcss";
 
 /* ============================================
@@ -52,6 +53,7 @@
   --line-height-p2: 1.5;
 
   /* Font Weights */
+/* Font Families - Override defaults with Raela */  --font-sans: 'Raela', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;  --font-mono: 'Raela', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-weight-heading: 700;
   --font-weight-subheader: 600;
   --font-weight-body: 400;
@@ -99,7 +101,7 @@
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Raela', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
     overflow-x: hidden;
@@ -179,12 +181,7 @@
    ============================================ */
 
 @layer components {
-  .font-fluent {
-    font-family: 'Segoe UI', "Segoe UI Web (West European)", -apple-system, sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
+/* Custom Font Classes */  .font-fluent {    font-family: 'Raela', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;    font-weight: 700;    letter-spacing: -0.02em;    line-height: 1.1;  }
 
   .glass-card {
     background: var(--glass-bg);

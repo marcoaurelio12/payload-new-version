@@ -45,7 +45,7 @@ const VariableCostsAccordion: React.FC<VariableCostsProps> = ({ costs }) => {
                     <span className="font-bold text-gray-900 dark:text-white">{cost.name}</span>
                   </td>
                   <td className="p-6">
-                     <span className="font-mono text-gray-600 dark:text-[#D1D1D1]">~{cost.estimated_cost}€</span>
+                     <span className="text-gray-600 dark:text-[#D1D1D1]">~{cost.estimated_cost}€</span>
                   </td>
                   <td className="p-6">
                      <p className="text-sm text-gray-500 dark:text-[#D1D1D1]/60">{cost.description}</p>

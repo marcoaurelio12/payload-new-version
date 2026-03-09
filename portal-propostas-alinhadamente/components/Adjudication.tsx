@@ -118,7 +118,7 @@ const Adjudication: React.FC<AdjudicationProps> = ({ proposalSlug, accessPass, o
               )}
 
               {/* Accept Button */}
-              <div className="flex justify-center">
+              <div className="flex flex-col items-center">
                 <button
                   disabled={isSubmitting}
                   onClick={handleAdjudicate}
@@ -137,6 +137,9 @@ const Adjudication: React.FC<AdjudicationProps> = ({ proposalSlug, accessPass, o
                     "CONFIRMAR PROPOSTA"
                   )}
                 </button>
+                <p className="text-center text-xs text-gray-400 dark:text-gray-1/50 mt-4 transition-colors">
+                  Valores apresentados em euros. Atualmente isento de IVA.
+                </p>
               </div>
 
               {/* Reject Button */}

@@ -26,10 +26,41 @@ pnpm install
 pnpm dev                        # Run backend LOCALLY, not in Docker
 
 # Terminal 2: Frontend (Proposal Portal) - runs on port 3005
-cd portal-propostas-alinhadamente
+cd portal-propostas-alinhamente
 npm install
 npm run dev
 ```
+
+### For AI Assistants: Starting Services
+
+**IMPORTANT:** The default working directory is `payload-multitenant/` (the backend folder), NOT the monorepo root.
+
+**Correct commands to start both servers from any directory:**
+
+```bash
+# 1. Start PostgreSQL (if not running)
+cd payload-multitenant && docker compose up -d postgres
+
+# 2. Start backend (from payload-multitenant directory)
+pnpm dev
+
+# 3. Start frontend (from portal-propostas-alinhamente directory)
+cd ../portal-propostas-alinhamente && npm run dev
+```
+
+**Directory structure:**
+```
+Alinhadamente/                      # Monorepo root (NOT the default working dir)
+├── payload-multitenant/            # Default working directory - run pnpm dev here
+│   └── docker-compose.yml          # For PostgreSQL
+└── portal-propostas-alinhamente/   # Frontend - run npm run dev here
+```
+
+**When user asks to "start the servers":**
+1. First check if PostgreSQL is running: `docker compose up -d postgres`
+2. Start backend with `pnpm dev` (in background)
+3. Start frontend with `cd ../portal-propostas-alinhamente && npm run dev` (in background)
+4. Verify both respond on ports 3000 and 3005
 
 ### ⚠️ IMPORTANT: Docker Setup
 
@@ -124,12 +155,14 @@ The `docker-compose.yml` in `payload-multitenant/` has TWO services:
 
 3. **Environment Variables**:
 
-   **Frontend** (`portal-propostas-alinhadamente/.env.local`):
+   **Frontend** (`portal-propostas-alinhamente/.env.local`):
    ```env
    VITE_API_URL=http://localhost:3000
    VITE_DEFAULT_SLUG=marquesevieira
    VITE_USE_MOCK=false
    ```
+
+   ⚠️ **IMPORTANT:** Ensure `VITE_API_URL` points to port **3000** (backend), not 3001. If you get "Failed to fetch" errors, check this first.
 
    **Backend** (`payload-multitenant/.env.local`):
    ```env

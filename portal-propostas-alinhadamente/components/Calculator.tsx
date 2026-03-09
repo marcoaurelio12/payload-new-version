@@ -5,12 +5,25 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
-  SparklesIcon,
   CheckIcon
 } from '@heroicons/react/24/solid';
+import DOMPurify from 'dompurify';
 import { Proposal, PricingTier, PricingFeature, PaymentModality } from '../types';
 import FeatureTooltip from './FeatureTooltip';
 import PaymentModalityToggle from './PaymentModalityToggle';
+
+/**
+ * Sanitize HTML content to prevent XSS attacks
+ * Allows only safe tags and attributes from the CMS RichText editor
+ */
+const sanitizeHtml = (html: string | undefined | null): string => {
+  if (!html) return '';
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ADD_ATTR: ['target'], // Allow target="_blank" for links
+  });
+};
 
 interface CalculatorProps {
   proposal: Proposal;
@@ -117,8 +130,7 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                     }`}
                   >
                     {tier.recommended && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#41CE2A] text-[#1F1F1F] text-[10px] font-black uppercase px-3 py-1 rounded-full flex items-center gap-1 shadow-md">
-                        <SparklesIcon className="w-3 h-3" />
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#41CE2A] text-[#1F1F1F] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">
                         Recomendado
                       </div>
                     )}
@@ -251,16 +263,16 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                                         <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                                             <div className="space-y-2">
                                                 <p className="text-[10px] font-black uppercase text-gray-400 dark:text-[#D1D1D1]/40 transition-colors">Solução</p>
-                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: addon.detailed_solution || addon.description || '' }} />
+                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: sanitizeHtml(addon.detailed_solution || addon.description) }} />
                                             </div>
                                             <div className="space-y-2">
                                                 <p className="text-[10px] font-black uppercase text-[#41CE2A]/60">ROI Impact</p>
-                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: addon.roi_impact || '' }} />
+                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: sanitizeHtml(addon.roi_impact) }} />
                                             </div>
                                             {addon.third_party_costs && (
                                             <div className="space-y-2">
                                                 <p className="text-[10px] font-black uppercase text-gray-400/80">Custos de Terceiros</p>
-                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: addon.third_party_costs }} />
+                                                <div className="text-xs text-gray-600 dark:text-[#D1D1D1]" dangerouslySetInnerHTML={{ __html: sanitizeHtml(addon.third_party_costs) }} />
                                             </div>
                                             )}
                                         </div>
@@ -333,9 +345,6 @@ const Calculator: React.FC<CalculatorProps> = ({ proposal, onTotalChange }) => {
                     <button onClick={() => document.getElementById('contrato')?.scrollIntoView({ behavior: 'smooth' })} className="w-full py-4 px-6 bg-[#41CE2A] text-[#1F1F1F] font-black text-base sm:text-xl rounded-xl flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-[#41CE2A]/20">
                         CONFIRMAR PROPOSTA
                     </button>
-                    <p className="text-center text-[10px] text-gray-400 dark:text-[#D1D1D1]/30 mt-4 uppercase tracking-widest transition-colors">
-                        Valores s/ IVA • Pagamento 50% na Confirmação
-                    </p>
                 </div>
             </div>
         </div>

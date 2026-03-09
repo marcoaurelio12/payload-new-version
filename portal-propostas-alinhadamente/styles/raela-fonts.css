@@ -1,0 +1,156 @@
+/* LTS Raela Pro Font Family */
+/* Font weights mapping:
+   - Thin: 100
+   - ExtraLight: 200
+   - Light: 300
+   - Regular: 400
+   - Medium: 500
+   - SemiBold: 600
+   - Bold: 700
+   - ExtraBold: 800
+   - Black: 900
+*/
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-ExtraLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-ExtraBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raela';
+  src: url('/fonts/raela/LTSRaelaPro-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
