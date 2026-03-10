@@ -739,14 +739,81 @@ CMD ["sh", "-c", "pnpm payload migrate && pnpm start"]
 
 ## Sistema de Migrações — Regras Críticas
 
-### NUNCA fazer
+### 1. NUNCA modificar a base de dados diretamente
+
+```bash
+# ❌ NUNCA fazer isto
+docker exec ... psql -c "ALTER TABLE ... ADD COLUMN ..."
+
+# ✅ SEMPRE criar um ficheiro de migração
+pnpm payload migrate:create
+```
+
+### 2. Migrações são imutáveis após deployment
+
+Uma vez que uma migração correu em qualquer ambiente (staging/produção), **nunca editar ou apagar**. Se houver um erro, criar uma nova migração para corrigir.
+
+```bash
+# ❌ Não editar: src/migrations/20260306_183324.ts
+# ✅ Criar nova: src/migrations/20260310_fix_tooltip_column.ts
+```
+
+### 3. Tornar migrações idempotentes (seguras para re-executar)
+
+Usar padrões `IF NOT EXISTS` / `IF EXISTS` sempre que possível:
+
+```typescript
+// ❌ Vai falhar se a coluna já existir
+await db.execute(sql`ALTER TABLE "my_table" ADD COLUMN "tooltip" varchar;`);
+
+// ✅ Seguro para correr múltiplas vezes
+await db.execute(sql`
+  DO $$
+  BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'my_table' AND column_name = 'tooltip') THEN
+      ALTER TABLE "my_table" ADD COLUMN "tooltip" varchar;
+    END IF;
+  END $$;
+`);
+```
+
+### 4. Antes de fazer deploy, verificar estado das migrações
+
+```bash
+# Verificar que migrações já estão aplicadas
+docker exec <db-container> psql -U <user> -d <db> -c "SELECT * FROM payload_migrations ORDER BY name;"
+
+# Comparar com ficheiros de migração
+ls -la src/migrations/
+```
+
+### 5. Se uma migração falhar a meio
+
+- **Não reiniciar o container** sem investigar o erro primeiro
+- Verificar se houve alterações parciais na base de dados
+- Fazer rollback manual OU marcar a migração como completa se o schema já estiver correto
+
+### 6. Sincronizar alterações de schema com a equipa
+
+Quando criar/modificar migrações, **comunicar**. A tabela `payload_migrations` deve manter-se em sincronia com o estado real da base de dados.
+
+### Checklist rápida antes de deploy de alterações de schema
+
+- [ ] Criada migração via `pnpm payload migrate:create`
+- [ ] Migração é idempotente (usa `IF NOT EXISTS` ou similar)
+- [ ] Testada migração localmente
+- [ ] NÃO foram modificados ficheiros de migração existentes
+- [ ] Equipa informada sobre a nova migração
+
+### Resumo: NUNCA fazer
 
 - Nunca editar um ficheiro de migração já aplicado em produção.
 - Nunca apagar ficheiros de migração do repositório.
 - Nunca alterar o schema da base de dados manualmente (SQL direto).
 - Nunca fazer `DROP TABLE` ou `DROP COLUMN` sem migração.
 
-### SEMPRE fazer
+### Resumo: SEMPRE fazer
 
 - Correr `pnpm payload migrate:create` depois de alterar qualquer collection.
 - Testar a migração localmente antes de fazer push.
@@ -759,7 +826,7 @@ CMD ["sh", "-c", "pnpm payload migrate && pnpm start"]
 ```
 1. Criar/alterar collections localmente
 2. pnpm payload migrate:create
-3. Verificar ficheiro de migração gerado
+3. Verificar ficheiro de migração gerado (confirmar idempotência)
 4. pnpm payload migrate (aplicar localmente)
 5. Testar a aplicação localmente
 6. pnpm build (verificar que compila)
