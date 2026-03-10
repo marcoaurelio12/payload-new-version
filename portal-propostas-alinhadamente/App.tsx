@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useProposal, useProposalSlugFromUrl } from './hooks/useProposal';
 import Logo from './components/Logo';
+import ErrorScreen from './components/ErrorScreen';
 import PaymentModalityToggle from './components/PaymentModalityToggle';
 
 // ============================================
@@ -1064,6 +1065,18 @@ const AppTailwind: React.FC = () => {
   }, [urlSlug]);
 
   const useMockData = !slug || import.meta.env.VITE_USE_MOCK === 'true';
+
+  // In production, show error screen if no slug is provided
+  if (!slug && !import.meta.env.DEV && !import.meta.env.VITE_USE_MOCK) {
+    return (
+      <ErrorScreen
+        error={{
+          type: 'not_found',
+          message: 'Nenhuma proposta especificada. Por verifique o link ou contacte geral@alinhadamente.pt'
+        }}
+      />
+    );
+  }
 
   const { proposal, siteConfig, loading, error } = useProposal(slug, { useMock: useMockData });
 

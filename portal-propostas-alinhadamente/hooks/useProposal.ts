@@ -281,11 +281,12 @@ export const useProposalSlugFromUrl = (): string | null => {
     const path = window.location.pathname;
 
     // Match patterns: /p/slug (protected), /o/slug, /proposal/slug, /slug
+    // All patterns support optional trailing slash for Cloudflare Pages URL normalization
     const patterns = [
-      /^\/p\/([^/]+)/,       // /p/:slug (protected route - requires auth)
-      /^\/o\/([^/]+)/,       // /o/:slug
-      /^\/proposal\/([^/]+)/, // /proposal/:slug
-      /^\/([^/]+)$/          // /:slug (root level)
+      /^\/p\/([^/]+)\/?/,       // /p/:slug (protected route - requires auth)
+      /^\/o\/([^/]+)\/?/,       // /o/:slug
+      /^\/proposal\/([^/]+)\/?/, // /proposal/:slug
+      /^\/([^/]+)\/?$/          // /:slug (root level)
     ];
 
     for (const pattern of patterns) {

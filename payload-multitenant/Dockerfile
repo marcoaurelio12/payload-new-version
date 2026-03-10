@@ -60,6 +60,9 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install pnpm for running migrations
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Copy public folder (create empty if not exists)
 RUN mkdir -p ./public
 COPY --from=builder /app/public ./public/
@@ -73,12 +76,22 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy migrations and necessary files for running payload migrate
+COPY --from=builder --chown=nextjs:nodejs /app/migrations ./migrations
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/next.config.mjs ./next.config.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
+
+# Copy node_modules for payload CLI (needed for migrations)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+# Run migrations before starting the server
+# This ensures schema is always in sync with code
+CMD HOSTNAME="0.0.0.0" sh -c "pnpm payload migrate && node server.js"
