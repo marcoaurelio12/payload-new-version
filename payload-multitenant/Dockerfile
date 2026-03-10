@@ -33,6 +33,9 @@ COPY . .
 # Ensure public folder exists (for Docker COPY)
 RUN mkdir -p ./public
 
+# Ensure migrations folder exists (may not exist on first deploy)
+RUN mkdir -p ./migrations
+
 # Generate import map for Payload plugins (multi-tenant, etc.)
 RUN \
   if [ -f yarn.lock ]; then yarn run generate:importmap; \
