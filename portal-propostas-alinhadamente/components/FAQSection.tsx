@@ -57,9 +57,10 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <p className="text-gray-600 dark:text-[#D1D1D1]/60 leading-relaxed pt-2 transition-colors">
-                    {faq.answer}
-                  </p>
+                  <div
+                    className="text-gray-600 dark:text-[#D1D1D1]/60 leading-relaxed pt-2 transition-colors faq-answer"
+                    dangerouslySetInnerHTML={{ __html: faq.answer }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
