@@ -137,7 +137,7 @@ export interface ApiProposal {
   }>;
   faqs?: Array<{
     question: string;
-    answer: string;
+    answer: string | RichText;
     category?: string;
   }>;
   includedItems?: Array<{
@@ -247,7 +247,7 @@ export function transformApiProposal(apiProposal: ApiProposal): { proposal: Prop
   // Map FAQs
   const faqs: Faq[] = (apiProposal.faqs || []).map(f => ({
     question: f.question,
-    answer: f.answer,
+    answer: typeof f.answer === "string" ? f.answer : richTextToHtml(f.answer) || "",
     category: f.category
   }));
 
